@@ -9,7 +9,7 @@ import pickle
 from nltk.classify.scikitlearn import SklearnClassifier
 from sklearn.naive_bayes import MultinomialNB, BernoulliNB
 from sklearn.svm import LinearSVC
-from sklearn.linear_model import 
+from sklearn.linear_model import SGDClassifier
 from statistics import mode
 
 # classifies data based on the majority of the algorithms' choice
