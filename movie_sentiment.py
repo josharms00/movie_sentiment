@@ -71,15 +71,47 @@ def train_and_pickle(documents):
     NaiveBayes_classifier = nltk.NaiveBayesClassifier.train(train_set)
 
     save_classifier = open("trained_classifiers/naivebayes.pickle", "wb")
-    pickle.dump(classifier, save_classifier)
+    pickle.dump(NaiveBayes_classifier, save_classifier)
 
-    print("Naive Bayes Accurarcy: ", (nltk.classify.accuracy(classifier, test_set)))
+    print("Naive Bayes Accurarcy: ", (nltk.classify.accuracy(NaiveBayes_classifier, test_set)))
 
-    
+    # multinomial naive bayes
+    MultinomialNB_classifier = SklearnClassifier(MultinomialNB())
 
+    MultinomialNB_classifier.train(train_set)
 
+    save_classifier = open("trained_classifiers/mn_naivebayes.pickle", "wb")
+    pickle.dump(MultinomialNB_classifier, save_classifier)
 
+    print("Multinomial Naive Bayes Accurarcy: ", (nltk.classify.accuracy(MultinomialNB_classifier, test_set)))
 
+    # bernoulli naive bayes
+    BernoulliNB_classifier = SklearnClassifier(BernoulliNB())
+
+    BernoulliNB_classifier.train(train_set)
+
+    save_classifier = open("trained_classifiers/bern_naivebayes.pickle", "wb")
+    pickle.dump(BernoulliNB_classifier, save_classifier)
+
+    print("Bernoulli Naive Bayes Accurarcy: ", (nltk.classify.accuracy(BernoulliNB_classifier, test_set)))
+
+    # linear state vector classifier
+    LinearSVC_classifier = SklearnClassifier(LinearSVC())
+
+    save_classifier = open("trained_classifiers/linearsvc.pickle", "wb")
+    pickle.dump(LinearSVC_classifier, save_classifier)
+
+    LinearSVC_classifier.train(train_set)
+    print("LinearSVC Accurarcy: ", (nltk.classify.accuracy(LinearSVC_classifier, test_set)))
+
+    # stochastic gradient descent
+    SGDClassifier_classifier = SklearnClassifier(SGDClassifier())
+
+    save_classifier = open("trained_classifiers/sgd_classifier.pickle", "wb")
+    pickle.dump(SGDClassifier_classifier, save_classifier)
+
+    SGDClassifier_classifier.train(train_set)
+    print("SGDClassifier Accurarcy: ", (nltk.classify.accuracy(SGDClassifier_classifier, test_set)))
 
 
 if __name__ == "__main__":
