@@ -13,6 +13,9 @@ from sklearn.linear_model import SGDClassifier
 from statistics import mode
 import os
 
+word_features = []
+documents = []
+
 # returns frequency distribution
 def preprocessing(documents):
     # create lammentizer
@@ -47,8 +50,6 @@ else:
     pos_rev = open("movie review data/positive.txt", "r").read()
     neg_rev = open("movie review data/negative.txt", "r").read()
 
-    documents = []
-
     for r in pos_rev.split("\n"):
         documents.append( (r, "pos") )
 
@@ -62,6 +63,7 @@ else:
 
     save_feats = open("movie review data/word_features.pickle", "wb")
     pickle.dump(word_features, save_feats)
+    
 
 # classifies data based on the majority of the algorithms' choice
 class AlgoVote(ClassifierI):
@@ -87,12 +89,11 @@ def find_features(document):
     return features
 
 
-def train_and_pickle(documents):
-
-    random.shuffle(documents)
+def train_and_pickle(docs):
+    random.shuffle(docs)
 
     # convert the document into feature list to see what words show up more often in bad review vs good reviews
-    featureset = [ (find_features(doc), cat) for (doc, cat) in documents]
+    featureset = [ (find_features(doc), cat) for (doc, cat) in docs]
 
     train_set = featureset[:10000]
     test_set = featureset[10000:]
@@ -143,15 +144,41 @@ def train_and_pickle(documents):
     SGDClassifier_classifier.train(train_set)
     print("SGDClassifier Accurarcy: ", (nltk.classify.accuracy(SGDClassifier_classifier, test_set)))
 
-    def sentiment(text):
-        features = find_features(text)
+# load all pickled models and create class object
+if os.path.isfile("trained_classifiers/naivebayes.pickle"):
 
-        return 
+    open_classifier = open("trained_classifiers/naivebayes.pickle", "rb")
+    NaiveBayes_classifier = pickle.load(open_classifier)
+
+    open_classifier = open("trained_classifiers/mn_naivebayes.pickle", "rb")
+    MultinomialNB_classifier = pickle.load(open_classifier)
+
+    open_classifier = open("trained_classifiers/bern_naivebayes.pickle", "rb")
+    BernoulliNB_classifier = pickle.load(open_classifier)
+
+    open_classifier = open("trained_classifiers/linearsvc.pickle", "rb")
+    LinearSVC_classifier = pickle.load(open_classifier)
+
+    open_classifier = open("trained_classifiers/sgd_classifier.pickle", "rb")
+    SGDClassifier_classifier = pickle.load(open_classifier)
+
+    voter = AlgoVote(NaiveBayes_classifier, MultinomialNB_classifier, BernoulliNB_classifier
+                    LinearSVC_classifier, SGDClassifier_classifier)
+else:
+    print("Algorithms have not been trained")
+
+# analze outside data
+def sentiment(text):
+    features = find_features(text)
+
+    return voter.classify(features)
 
 
 if __name__ == "__main__":
 
-    train_and_pickle(documents)
+    docs = documents
+
+    train_and_pickle(docs)
 
    
 
