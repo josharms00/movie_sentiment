@@ -88,7 +88,6 @@ def find_features(document):
 
     return features
 
-
 def train_and_pickle(docs):
     random.shuffle(docs)
 
@@ -129,19 +128,21 @@ def train_and_pickle(docs):
     # linear state vector classifier
     LinearSVC_classifier = SklearnClassifier(LinearSVC())
 
+    LinearSVC_classifier.train(train_set)
+
     save_classifier = open("trained_classifiers/linearsvc.pickle", "wb")
     pickle.dump(LinearSVC_classifier, save_classifier)
 
-    LinearSVC_classifier.train(train_set)
     print("LinearSVC Accurarcy: ", (nltk.classify.accuracy(LinearSVC_classifier, test_set)))
 
     # stochastic gradient descent
     SGDClassifier_classifier = SklearnClassifier(SGDClassifier())
 
+    SGDClassifier_classifier.train(train_set)
+
     save_classifier = open("trained_classifiers/sgd_classifier.pickle", "wb")
     pickle.dump(SGDClassifier_classifier, save_classifier)
 
-    SGDClassifier_classifier.train(train_set)
     print("SGDClassifier Accurarcy: ", (nltk.classify.accuracy(SGDClassifier_classifier, test_set)))
 
 # load all pickled models and create class object
@@ -149,36 +150,44 @@ if os.path.isfile("trained_classifiers/naivebayes.pickle"):
 
     open_classifier = open("trained_classifiers/naivebayes.pickle", "rb")
     NaiveBayes_classifier = pickle.load(open_classifier)
+    open_classifier.close()
 
     open_classifier = open("trained_classifiers/mn_naivebayes.pickle", "rb")
     MultinomialNB_classifier = pickle.load(open_classifier)
 
     open_classifier = open("trained_classifiers/bern_naivebayes.pickle", "rb")
     BernoulliNB_classifier = pickle.load(open_classifier)
+    open_classifier.close()
 
     open_classifier = open("trained_classifiers/linearsvc.pickle", "rb")
     LinearSVC_classifier = pickle.load(open_classifier)
+    open_classifier.close()
 
     open_classifier = open("trained_classifiers/sgd_classifier.pickle", "rb")
     SGDClassifier_classifier = pickle.load(open_classifier)
+    open_classifier.close()
 
-    voter = AlgoVote(NaiveBayes_classifier, MultinomialNB_classifier, BernoulliNB_classifier
+    voter = AlgoVote(NaiveBayes_classifier, MultinomialNB_classifier, BernoulliNB_classifier,
                     LinearSVC_classifier, SGDClassifier_classifier)
 else:
     print("Algorithms have not been trained")
 
 # analze outside data
 def sentiment(text):
-    features = find_features(text)
+    feats = find_features(text)
 
-    return voter.classify(features)
+    return voter.classify(feats)
 
 
-if __name__ == "__main__":
+# docs = documents
 
-    docs = documents
+# train_and_pickle(docs)
 
-    train_and_pickle(docs)
+f = find_features("This movie was awesome! The acting was conan!")
+
+print(SGDClassifier_classifier.classify(f))
+
+    
 
    
 
