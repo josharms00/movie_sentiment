@@ -34,13 +34,16 @@ def preprocessing(documents):
     # create set of useless words
     stop_words = set(stopwords.words("english")) 
 
+    adjectives = ["JJ", "JJR", "JJS"]
+
     all_words = []
 
     for d in documents:
         _words = word_tokenize(d[0])
-        for w in _words:
-            if w not in stop_words:
-                all_words.append(lemmatizer.lemmatize(w.lower()))
+        pos = nltk.pos_tag(_words)
+        for w in pos:
+            if w not in stop_words and w[1] in adjectives:
+                all_words.append(lemmatizer.lemmatize(w[0].lower()))
 
     # convert to frequncy distribution of words
     all_words = nltk.FreqDist(all_words)
