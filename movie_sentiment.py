@@ -11,20 +11,7 @@ from sklearn.naive_bayes import MultinomialNB, BernoulliNB
 from sklearn.svm import LinearSVC
 from sklearn.linear_model import SGDClassifier
 from statistics import mode
-
-# classifies data based on the majority of the algorithms' choice
-class AlgoVote(ClassifierI):
-    def __init__(self, *classifiers):
-        self._classifiers = classifiers
-
-    def classify(self, features):
-        votes = []
-
-        for c in self._classifiers:
-            v = c.classify(features)
-            votes.append(v)
-
-        return mode(votes)
+import os
 
 # returns frequency distribution
 def preprocessing(documents):
@@ -49,6 +36,46 @@ def preprocessing(documents):
     all_words = nltk.FreqDist(all_words)
 
     return all_words
+
+if os.path.isfile("movie review data/word_features.pickle"):
+    _feats = open("movie review data/word_features.pickle", "rb")
+    word_features = pickle.load(_feats)
+    _feats.close()
+else:
+    # import training data
+    # 5300 of each review
+    pos_rev = open("movie review data/positive.txt", "r").read()
+    neg_rev = open("movie review data/negative.txt", "r").read()
+
+    documents = []
+
+    for r in pos_rev.split("\n"):
+        documents.append( (r, "pos") )
+
+    for r in neg_rev.split("\n"):
+        documents.append( (r, "neg") )
+
+    all_words = preprocessing(documents)
+
+    # convert to list of 5000 most common words
+    word_features = list(all_words.keys())[:5000]
+
+    save_feats = open("movie review data/word_features.pickle", "wb")
+    pickle.dump(word_features, save_feats)
+
+# classifies data based on the majority of the algorithms' choice
+class AlgoVote(ClassifierI):
+    def __init__(self, *classifiers):
+        self._classifiers = classifiers
+
+    def classify(self, features):
+        votes = []
+
+        for c in self._classifiers:
+            v = c.classify(features)
+            votes.append(v)
+
+        return mode(votes)
 
 # determines what words are important to classification
 def find_features(document):
@@ -116,26 +143,13 @@ def train_and_pickle(documents):
     SGDClassifier_classifier.train(train_set)
     print("SGDClassifier Accurarcy: ", (nltk.classify.accuracy(SGDClassifier_classifier, test_set)))
 
+    def sentiment(text):
+        features = find_features(text)
+
+        return 
+
 
 if __name__ == "__main__":
-
-    # import training data
-    # 5300 of each review
-    pos_rev = open("movie review data/positive.txt", "r").read()
-    neg_rev = open("movie review data/negative.txt", "r").read()
-
-    documents = []
-
-    for r in pos_rev.split("\n"):
-        documents.append( (r, "pos") )
-
-    for r in neg_rev.split("\n"):
-        documents.append( (r, "neg") )
-
-    all_words = preprocessing(documents)
-
-    # convert to list of 5000 most common words
-    word_features = list(all_words.keys())[:5000]
 
     train_and_pickle(documents)
 
