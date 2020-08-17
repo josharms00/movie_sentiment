@@ -13,8 +13,11 @@ from sklearn.linear_model import SGDClassifier
 from statistics import mode
 import os
 
+
 word_features = []
 documents = []
+
+
 
 # returns frequency distribution
 def preprocessing(documents):
@@ -183,9 +186,9 @@ def sentiment(text):
 
 # train_and_pickle(docs)
 
-f = find_features("This movie was awesome! The acting was conan!")
+# f = find_features("This movie was awesome! The acting was conan!")
 
-print(SGDClassifier_classifier.classify(f))
+# print(SGDClassifier_classifier.classify(f))
 
     
 
