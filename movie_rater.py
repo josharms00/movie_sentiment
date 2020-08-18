@@ -16,6 +16,11 @@ def getKeys():
 
 ckey, csecret, atoken, asecret = getKeys()
 
+pos = 0
+neg = 0
+cnt = 0
+total = 1000
+
 class tweet_listener(StreamListener):
 
     def on_data(self, data):
@@ -23,9 +28,20 @@ class tweet_listener(StreamListener):
 
         tweet = all_data["text"]
 
-        print(tweet)
+        res = s.sentiment(tweet)
 
-        return True
+        if res == 'pos':
+            pos +=1
+        else:
+            neg += 1
+
+        cnt += 1
+
+        if total == cnt:
+            print("Percentage of positive reviews: ", (pos/total))
+            return False
+        else: 
+            return True
 
     def on_error(self, status):
         print(status)
@@ -38,7 +54,13 @@ if __name__ == "__main__":
                 action="store", dest="movie",
                 help="pick a movie")
 
+    parser.add_argument('-t', '--tweets',
+                action="store", dest="tweets",
+                help="number of tweets to look at.")
+
     args = parser.parse_args()
+    
+    total = args.tweets
 
     auth = OAuthHandler(ckey, csecret)
     auth.set_access_token(atoken, asecret)
@@ -48,8 +70,3 @@ if __name__ == "__main__":
         twitterStream.filter(track=[args.movie])
     else:
         print("You need to request a movie to rate.")
-
-
-# print(s.sentiment("I’m like an hour fifteen into ONCE UPON A TIME... IN HOLLYWOOD and it’s beautiful and charming and absolutely nothing has happened yet"))
-
-# print(s.sentiment("The movie is what, 3 hours? And the first 2 hours 45 min was a bit ramble-y but promised either an exciting convergence of the A and B plots, or an emotional reckoning of an old star being given a second chance. We got neither and in the last 15 minutes we got excessive gore as two grown men fight and kill teenagers. Which. I should have seen coming I GUESS."))

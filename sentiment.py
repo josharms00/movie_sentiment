@@ -17,8 +17,6 @@ import os
 word_features = []
 documents = []
 
-
-
 # returns frequency distribution
 def preprocessing(documents):
     # create lammentizer
